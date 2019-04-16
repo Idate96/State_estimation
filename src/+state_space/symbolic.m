@@ -33,12 +33,12 @@ function [system, state_vars, input_vars] = generate_state_space()
     % system noise vars : samples from ~ normal(0, sensor_noise.var_std)
     % same order as input variables
     system_noise_eq = sym(zeros(18, 6));
-    system_noise_eq(4, :) = [-1, 0, 0, 0, -v, w];
-    system_noise_eq(5, :) = [-1, 0, 0, -w, 0, u];
-    system_noise_eq(6, :) = [-1, 0, 0, 0, -u, v];
+    system_noise_eq(4, :) = [-1, 0, 0, 0, w, -v];
+    system_noise_eq(5, :) = [0, -1, 0, -w, 0, u];
+    system_noise_eq(6, :) = [0, 0, -1, v, -u, 0];
     system_noise_eq(7, :) = [0, 0, 0, -1, - sin(phi) .* tan(theta), -cos(phi) .* tan(theta)];
     system_noise_eq(8, :) = [0, 0, 0, 0, -cos(phi), sin(phi)];
-    system_noise_eq(9, :) = [0, 0, 0, 0, sin(phi) ./ cos(theta), cos(phi) ./ cos(theta)];
+    system_noise_eq(9, :) = [0, 0, 0, 0, -sin(phi) ./ cos(theta), -cos(phi) ./ cos(theta)];
     system.system_noise_eq = system_noise_eq;
     
     % output function 
@@ -49,7 +49,7 @@ function [system, state_vars, input_vars] = generate_state_space()
         - (v .* cos(phi) - w .* sin(phi)) .* sin(psi_) + wind_x;
     y_dot_gps =(u .* cos(theta) + (v .* sin(phi) + w .* cos(phi)).*sin(theta)) .* sin(psi_) + ...
         + (v .* cos(phi) - w .* sin(phi)) .* cos(psi_) + wind_y;
-    z_dot_gps = - u .* sin(theta)  + (v .* sin(phi) + w .* cos(phi)) .* cos(theta);
+    z_dot_gps = - u .* sin(theta)  + (v .* sin(phi) + w .* cos(phi)) .* cos(theta)+wind_z;
     phi_gps = phi;
     theta_gps = theta;
     psi_gps = psi_;

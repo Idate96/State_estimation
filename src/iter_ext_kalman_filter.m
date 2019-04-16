@@ -26,15 +26,12 @@ function x_estimate = iter_ext_kalman_filter(z, u, x_opt_0, P_0, Q, R, time)
         [state_func_disc, noise_input_mat_disc] = c2d(state_grad, ...
                                         state_space.sys_noise_mat(x_kk1), time(k + 1) - time(k));
                                     
-        fprintf('det state Phi %f', det(state_func_disc));                            
         % 4. predicted covariance
         P_kk1 = state_func_disc * P_k1k1 * state_func_disc'  + ...
                   noise_input_mat_disc * Q * noise_input_mat_disc';
-        fprintf('det P_kk1 %f', det(P_kk1));
               
         % 5. kalman gain
         S_k = R + output_grad * P_kk1 * output_grad';
-        fprintf('det sk %f',det(S_k));
         K = P_kk1 * output_grad' / S_k;
         
         % 6. update of estimate with measurment z 
@@ -44,7 +41,6 @@ function x_estimate = iter_ext_kalman_filter(z, u, x_opt_0, P_0, Q, R, time)
         P_kk = (eye(num_states) - K * output_grad) * P_kk1 * ...
             (eye(num_states) - K * output_grad)' + K * R * K';
                 
-        fprintf('det pkk %f', det(P_kk))
         % update staes
         x_k1k1 = x_kk;
         P_k1k1 = P_kk;

@@ -1,0 +1,14 @@
+function preprocessed_data = estimate_pos(data, wind)
+    % add new references to ease reading
+    x = cumtrapz(data.t, data.u_n);
+    y = cumtrapz(data.t, data.v_n);
+    z = cumtrapz(data.t, data.w_n); 
+    
+    preprocessed_data = data;
+    preprocessed_data.x_dot = x_dot;
+    preprocessed_data.x = x;
+    preprocessed_data.y_dot = y_dot;
+    preprocessed_data.y = y;
+    preprocessed_data.z_dot = z_dot;
+    preprocessed_data.z = z;
+end

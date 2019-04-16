@@ -40,39 +40,34 @@ classdef TestStateSpace < matlab.unittest.TestCase
             testCase.verifyEqual(u_dot_grad_theta_num, u_dot_grad_theta_to_test_num);
         end
         function test_eq_of_motion(testCase)
-            % given the same initial state, measured and simulated vars
-            % should be the same
+            % givne th
             % 1. prediction of state using model
             data_aileron_3211 = load('simdata2019/da3211');
             time = data_aileron_3211.t;
             wind = struct();
-            wind.x = 0; % wind m\s
-            wind.y = 0;
-            wind.z = 0;
+            wind.x = 10; % wind m\s
+            wind.y = 6;
+            wind.z = 1;
             data_aileron_3211 = state_space.estimate_pos(data_aileron_3211, wind);
             [output_meas, state_meas, input_meas] = state_space.sort_measurments(data_aileron_3211);
             
             output_sim = zeros(size(output_meas));
+            x_k = [state_meas(:, 1); 0; 0; 0; 0; 0; 0; 1; 1; 1];
             num_samples = length(output_meas(1, :));
-            state_sim = zeros(18, num_samples);    
-            x_k = [state_meas(:, 1); 0; 0; 0; 0; 0; 0; 0; 0; 0];
-            state_sim(:, 1) = x_k;         
-            output_sim(:, 1) = state_space.output_func(x_k);
+            state_sim = zeros(18, num_samples);
 
             for k = 1:num_samples - 1
                 [t, x_k] = ode45(@(t, x) state_space.state_func(t, x, input_meas(:, k)), [time(k), time(k + 1)], x_k);
                 x_k = x_k(end, :)';
                 z_k = state_space.output_func(x_k);
-                state_sim(:, k + 1) = x_k;
-                output_sim(:, k + 1) = z_k;
+                state_sim(:, k) = x_k;
+                output_sim(:, k) = z_k;
             end
-            
             plotting.plot_compare_pos(time, output_sim, output_meas, 'images', 'pos');
             plotting.plot_compare_pos(time, output_sim, output_meas, 'images', 'vel');
             plotting.plot_compare_pos(time, output_sim, output_meas, 'images', 'angle');
             plotting.plot_compare_pos(time, output_sim, output_meas, 'images', 'aero');
-            
-%             testCase.assertEqual(output_sim, output_meas);
+
         end
     end
 end
